@@ -1,0 +1,166 @@
+﻿<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="utf-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1">
+    <title>School REST API Demo</title>
+
+    <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/css/bootstrap.min.css"
+          rel="stylesheet"
+          integrity="sha384-9ndCyUaIbzAi2FUVXJi0CjmCapSmO7SnpJef0486qhLnuZ2cdeRhO02iuK6FUUVM"
+          crossorigin="anonymous" />
+
+</head>
+<body>
+    <div class="container text-center">
+        <h1 class="my-4">School Demo</h1>
+
+        <div class="row justify-content-center">
+            <div class="col-md-6 form-container">
+
+                <h2 class="my-4">Creation</h2>
+
+                <h3>Create School</h3>
+                <form id="school" class="mb-4">
+                    <button type="submit" class="btn btn-dark w-100">Create new School</button>
+                </form>
+
+                <h3>Create Classroom</h3>
+                <form id="classroom" class="mb-4">
+                    <input name="size" type="text" class="form-control mb-2" required placeholder="Size">
+                    <input name="seats" type="number" class="form-control mb-2" required placeholder="Number of Seats">
+                    <div class="form-check d-flex justify-content-center mb-2">
+                        <input id="cynap_checkbox" name="cynap" type="checkbox" class="form-check-input">
+                        <label class="form-check-label ms-2" for="cynap_checkbox">Cynap</label>
+                    </div>
+                    <button type="submit" class="btn btn-dark w-100">Create new Classroom</button>
+                </form>
+
+                <h3>Create Student</h3>
+                <form id="student" class="mb-4">
+                    <select name="schoolclass" class="form-control mb-2" required>
+                        <option value="default" disabled selected>Schoolclass</option>
+                        <option value="0">3aWI</option>
+                        <option value="1">3bWI</option>
+                    </select>
+                    <select name="gender" class="form-control mb-2" required>
+                        <option value="default" disabled selected>Gender</option>
+                        <option value="0">Male</option>
+                        <option value="1">Female</option>
+                        <option value="2">Non-binary</option>
+                    </select>
+                    <input name="birthdate" type="datetime-local" class="form-control mb-2" required placeholder="Birthdate">
+                    <button type="submit" class="btn btn-dark w-100">Create new Student</button>
+                </form>
+
+                <hr>
+
+                <h2 class="my-4">Add Objects to Objects</h2>
+
+                <h3>Add Student to School</h3>
+                <form id="addStudentToSchool" class="mb-4">
+                    <select name="school" class="school-dropdown form-control mb-2" required></select>
+                    <select name="student" class="student-dropdown form-control mb-2" required></select>
+                    <button type="submit" class="btn btn-dark w-100">Add student to school</button>
+                </form>
+
+                <h3>Add Classroom to School</h3>
+                <form id="addClassroomToSchool" class="mb-4">
+                    <select name="school" class="school-dropdown form-control mb-2" required></select>
+                    <select name="classroom" class="classroom-dropdown form-control mb-2" required></select>
+                    <button type="submit" class="btn btn-dark w-100">Add classroom to school</button>
+                </form>
+
+                <h3>Add Student to Classroom</h3>
+                <form id="addStudentToClassroom" class="mb-4">
+                    <select name="classroom" class="classroom-dropdown form-control mb-2" required></select>
+                    <select name="student" class="student-dropdown form-control mb-2" required></select>
+                    <button type="submit" class="btn btn-dark w-100">Add student to classroom</button>
+                </form>
+
+                <hr>
+
+                <!-- -------- School values -------- -->
+                <h3 class="my-4">Values</h3>
+                <form id="schoolValues" class="mb-3">
+                    <select id="schoolValues-dropdown"
+                            class="schoolValues-dropdown school-dropdown form-control mb-3"
+                            required></select>
+
+                    <!-- einzelne Kennzahlen -->
+                    <div class="value-box">
+                        <strong>Number of Students:</strong>
+                        <pre id="numberOfStudents">...</pre>
+                    </div>
+                    <div class="value-box">
+                        <strong>Number of male Students:</strong>
+                        <pre id="numberOfMaleStudents">...</pre>
+                    </div>
+                    <div class="value-box">
+                        <strong>Number of female Students:</strong>
+                        <pre id="numberOfFemaleStudents">...</pre>
+                    </div>
+                    <div class="value-box">
+                        <strong>Average Age of Students:</strong>
+                        <pre id="averageAgeOfStudents">...</pre>
+                    </div>
+                    <div class="value-box">
+                        <strong>Number of Classrooms:</strong>
+                        <pre id="numberOfClassrooms">...</pre>
+                    </div>
+                    <div class="value-box">
+                        <strong>Classrooms with Cynap:</strong>
+                        <pre id="classroomsWithCynap">...</pre>
+                    </div>
+                    <div class="value-box">
+                        <strong>Classrooms with Number of Students:</strong>
+                        <pre id="classroomsWithNumberOfStudents">...</pre>
+                    </div>
+                </form>
+
+                <hr>
+
+                <form id="percentageOfFemaleStudentsInSchoolclass" class="mb-3">
+                    <select name="school" class="school-dropdown form-control mb-2" required></select>
+                    <select name="schoolclass" class="form-control mb-2" required>
+                        <option value="default" disabled selected>Schoolclass</option>
+                        <option value="0">3aWI</option>
+                        <option value="1">3bWI</option>
+                    </select>
+                    <button type="submit" class="btn btn-dark w-100 mb-2">Execute</button>
+                    <div class="value-box">
+                        <strong>Percentage of female Students in Schoolclass:</strong>
+                        <pre id="percentageOfFemaleStudentInSchoolclass_output">...</pre>
+                    </div>
+                </form>
+
+                <hr>
+
+                <form id="isClassroomBigEnough" class="mb-5">
+                    <select name="school" class="school-dropdown form-control mb-2" required></select>
+                    <select name="classroom" class="classroom-dropdown form-control mb-2" required></select>
+                    <select name="schoolclass" class="form-control mb-2" required>
+                        <option value="default" disabled selected>Schoolclass</option>
+                        <option value="0">3aWI</option>
+                        <option value="1">3bWI</option>
+                    </select>
+                    <button type="submit" class="btn btn-dark w-100 mb-2">Execute</button>
+                    <div class="value-box">
+                        <strong>Is the Classroom big enough for the Schoolclass:</strong>
+                        <pre id="isClassroomBigEnough_output">...</pre>
+                    </div>
+                </form>
+            </div>
+
+            <div class="col-md-6 output-container">
+                <div class="p-3 border border-secondary rounded bg-light text-start">
+                    <h4 class="text-center">Output</h4>
+                    <pre id="output">Form submission results will appear here…</pre>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <script src="./script.js"></script>
+</body>
+</html>
