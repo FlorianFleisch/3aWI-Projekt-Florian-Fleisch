@@ -10,5 +10,7 @@
             Name = name;
             Size = size;
         }
+
+        protected Room() { }
     }
 }
