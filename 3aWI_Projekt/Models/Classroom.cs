@@ -58,4 +58,5 @@ public class Classroom : Room
     {
         _Cynap = cynap;
     }
+    protected Classroom() : base() { }
 }

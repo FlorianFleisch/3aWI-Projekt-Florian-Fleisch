@@ -38,4 +38,6 @@
         SchoolClass = schoolClass;
         Track = track;
     }
+
+    protected Student() : base() {}
 }

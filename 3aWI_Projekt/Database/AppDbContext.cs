@@ -5,33 +5,13 @@ namespace _3aWI_Projekt.Database;
 
 public class AppDbContext : DbContext
 {
-    public DbSet<School> Schools => Set<School>();
-    public DbSet<Student> Students => Set<Student>();
-    public DbSet<Classroom> Classrooms => Set<Classroom>();
+    public DbSet<School> Schools { get; set; }
+    public DbSet<Student> Students { get; set; }
+    public DbSet<Classroom> Classrooms { get; set; }
 
-    public AppDbContext(DbContextOptions<AppDbContext> opt) : base(opt) { }
-
-    protected override void OnModelCreating(ModelBuilder mb)
+    protected override void OnConfiguring(DbContextOptionsBuilder optionsBuilder)
     {
-        // ---------- Primärschlüssel ----------
-        mb.Entity<School>().HasKey(s => s.Id);
-        mb.Entity<Student>().HasKey(s => s.Id);
-        mb.Entity<Classroom>().HasKey(c => c.Id);
-
-        // ---------- Beziehungen ----------
-        mb.Entity<School>()
-          .HasMany(s => s.Students)
-          .WithOne()
-          .OnDelete(DeleteBehavior.Cascade);
-
-        mb.Entity<School>()
-          .HasMany(s => s.Classrooms)
-          .WithOne()
-          .OnDelete(DeleteBehavior.Cascade);
-
-        // Classroom erbt von School → Rekursion verhindern
-        mb.Entity<Classroom>()
-          .Ignore(c => c.Classrooms)
-          .Ignore(c => c.Students);  // falls doppelt vorhanden
+        string dbPath = Path.Combine(AppContext.BaseDirectory, "app.db");
+        optionsBuilder.UseSqlite("Data Source=app.db");
     }
 }

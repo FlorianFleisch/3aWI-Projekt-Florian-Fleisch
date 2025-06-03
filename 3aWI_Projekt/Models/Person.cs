@@ -45,4 +45,6 @@
     {
         _Lastname = newLastname;
     }
+
+    protected Person() { }
 }
