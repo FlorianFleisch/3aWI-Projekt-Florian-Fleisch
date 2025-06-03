@@ -1,12 +1,48 @@
-﻿namespace _3aWI_Projekt.Models;   
-public class Person
+﻿public class Person
 {
-    public string Geschlecht { get; set; }
-    public DateTime Geburtsdatum { get; set; }
-
-    public Person(string geschlecht, DateTime geburtsdatum)
+    private string _Firstname;
+    public string Firstname { get { return _Firstname; } }
+    private string _Lastname;
+    public string Lastname { get { return _Lastname; } }
+    private DateTime _Birthdate { get; set; }
+    public int Age
     {
-        Geschlecht = geschlecht;
-        Geburtsdatum = geburtsdatum;
+        get
+        {
+            return DateTime.Now.Year - _Birthdate.Year;
+        }
+    }
+
+    public enum Genders 
+    {
+        m = 0, 
+        w = 1,
+        d = 2
+    }
+    private Genders _Gender;
+    public Genders Gender { get { return _Gender; } }
+    
+    public Person(string firstname, string lastname, Genders gender, DateTime birthdate)
+    {
+        _Firstname = firstname;
+        _Lastname = lastname;
+        _Gender = gender;
+        _Birthdate = birthdate;
+
+    }
+
+    public void changeBirthday(DateTime newBirthdate)
+    {
+        _Birthdate = newBirthdate;
+    }
+
+    public void changeFirstname(string newFirstname)
+    {
+        _Firstname = newFirstname;
+    }
+
+    public void changeLastname(string newLastname)
+    {
+        _Lastname = newLastname;
     }
 }
