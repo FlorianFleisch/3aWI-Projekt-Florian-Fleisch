@@ -121,6 +121,8 @@ namespace _3aWI_Projekt.Controllers
             if (room == null) return NotFound();
             int size = _context.Students.Count(s => s.SchoolClass.ToString() == className);
             return Ok(room.Seats >= size);
+        {
+            return Ok(_context.Schools.Select(s => new { s.ID, s.Name }));
         }
     }
 }
