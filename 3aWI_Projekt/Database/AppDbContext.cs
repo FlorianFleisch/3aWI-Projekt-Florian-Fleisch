@@ -1,6 +1,5 @@
 ﻿using Microsoft.EntityFrameworkCore;
 using _3aWI_Projekt.Models;
-
 namespace _3aWI_Projekt.Database;
 
 public class AppDbContext : DbContext
