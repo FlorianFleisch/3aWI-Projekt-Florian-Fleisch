@@ -1,17 +1,18 @@
-﻿using Microsoft.EntityFrameworkCore;
+using Microsoft.EntityFrameworkCore;
 using _3aWI_Projekt.Models;
 
-namespace _3aWI_Projekt.Database;
-
-public class AppDbContext : DbContext
+namespace _3aWI_Projekt.Database
 {
-    public DbSet<School> Schools { get; set; }
-    public DbSet<Student> Students { get; set; }
-    public DbSet<Classroom> Classrooms { get; set; }
-
-    protected override void OnConfiguring(DbContextOptionsBuilder optionsBuilder)
+    public class AppDbContext : DbContext
     {
-        string dbPath = Path.Combine(AppContext.BaseDirectory, "app.db");
-        optionsBuilder.UseSqlite("Data Source=app.db");
+        public DbSet<School> Schools { get; set; }
+        public DbSet<Student> Students { get; set; }
+        public DbSet<Classroom> Classrooms { get; set; }
+
+        protected override void OnConfiguring(DbContextOptionsBuilder optionsBuilder)
+        {
+            string dbPath = Path.Combine(AppContext.BaseDirectory, "app.db");
+            optionsBuilder.UseSqlite($"Data Source={dbPath}");
+        }
     }
 }

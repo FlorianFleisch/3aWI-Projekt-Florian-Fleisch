@@ -1,129 +1,53 @@
-﻿using Microsoft.AspNetCore.Mvc;
-using System;
-using System.Collections.Generic;
-using System.Linq;
+using Microsoft.AspNetCore.Mvc;
+using _3aWI_Projekt.Database;
+using _3aWI_Projekt.DTO;
+using _3aWI_Projekt.Models;
 
-/// <summary>
-/// Ein einziger Controller, der alles bedient, was dein HTML braucht.
-/// Die echten Klassen (School, Student, Classroom) bleiben unverändert ―
-/// wir halten nur externe IDs in Dictionaries.
-/// </summary>
-[ApiController]
-[Route("api")]
-public class SchoolController : ControllerBase
+namespace _3aWI_Projekt.Controllers
 {
-    private static readonly Dictionary<int, School> Schools = new();
-    private static readonly Dictionary<int, Student> Students = new();
-    private static readonly Dictionary<int, Classroom> Classrooms = new();
-
-    private static int _nextSchoolId = 1;
-    private static int _nextStudentId = 1;
-    private static int _nextClassroomId = 1;
-
-    public record StudentDto(string SchoolClass, string Gender, DateTime Birthdate);
-    public record ClassroomDto(string Size, int Seats, bool Cynap);
-
-    // ---------- Create ----------
-    [HttpPost("schools")]
-    public ActionResult<object> CreateSchool()
+    [ApiController]
+    [Route("api/[controller]")]
+    public class SchoolController : ControllerBase
     {
-        int id = _nextSchoolId++;
-        Schools[id] = new School();
-        return Created($"/api/schools/{id}", new { id });
-    }
+        private readonly AppDbContext _context;
 
-    [HttpPost("students")]
-    public ActionResult<object> CreateStudent([FromBody] StudentDto dto)
-    {
-        int id = _nextStudentId++;
-        var genderStr = dto.Gender switch { "0" => "Männlich", "1" => "Weiblich", _ => "Non-binary" };
-        var student = new Student(genderStr, dto.Birthdate,
-                                    MapClass(dto.SchoolClass), $"Student{id}", $"L{id}");
-        Students[id] = student;
-        return Created($"/api/students/{id}", new { id, student.Vorname, student.Nachname });
-    }
-
-    [HttpPost("classrooms")]
-    public ActionResult<object> CreateClassroom([FromBody] ClassroomDto dto)
-    {
-        int id = _nextClassroomId++;
-        var room = new Classroom(dto.Size, dto.Seats, dto.Cynap);
-        Classrooms[id] = room;
-        return Created($"/api/classrooms/{id}", new { id, room.Size, room.NumberOfSeats });
-    }
-
-    // ---------- Relationen ----------
-    [HttpPost("schools/{schoolId}/students/{studentId}")]
-    public IActionResult AddStudentToSchool(int schoolId, int studentId)
-    {
-        if (!Schools.TryGetValue(schoolId, out var school) ||
-            !Students.TryGetValue(studentId, out var student)) return NotFound();
-        school.AddStudent(student);
-        return NoContent();
-    }
-
-    [HttpPost("schools/{schoolId}/classrooms/{roomId}")]
-    public IActionResult AddClassroomToSchool(int schoolId, int roomId)
-    {
-        if (!Schools.TryGetValue(schoolId, out var school) ||
-            !Classrooms.TryGetValue(roomId, out var room)) return NotFound();
-        school.AddClassroom(room);
-        return NoContent();
-    }
-
-    [HttpPost("classrooms/{roomId}/students/{studentId}")]
-    public IActionResult AddStudentToClassroom(int roomId, int studentId)
-    {
-        if (!Classrooms.TryGetValue(roomId, out var room) ||
-            !Students.TryGetValue(studentId, out var student)) return NotFound();
-        room.AddStudent(student);
-        return NoContent();
-    }
-
-    // ---------- Listen ----------
-    [HttpGet("schools")] public IActionResult GetSchools() => Ok(Schools.Keys.Select(id => new { id }));
-    [HttpGet("students")] public IActionResult GetStudents() => Ok(Students.Select(k => new { id = k.Key, k.Value.Vorname, k.Value.Nachname }));
-    [HttpGet("classrooms")] public IActionResult GetClassrooms() => Ok(Classrooms.Select(k => new { id = k.Key, k.Value.Size, k.Value.NumberOfSeats }));
-
-    // ---------- Kennzahlen ----------
-    [HttpGet("schools/{schoolId}/values")]
-    public IActionResult GetSchoolValues(int schoolId)
-    {
-        if (!Schools.TryGetValue(schoolId, out var school)) return NotFound();
-        var (male, female) = school.GetMaleAndFemaleStudentCount();
-        var values = new
+        public SchoolController(AppDbContext context)
         {
-            numberOfStudents = school.GetNumberOfStudents(),
-            numberOfMaleStudents = male,
-            numberOfFemaleStudents = female,
-            averageAgeOfStudents = school.GetAverageAge(),
-            numberOfClassrooms = school.GetNumberOfClassrooms(),
-            classroomsWithCynap = school.GetClassroomsWithCynap()
-                                               .Select(c => Classrooms.First(x => x.Value == c).Key),
-            classroomsWithNumberOfStudents = school.GetClassStudentCounts()
-        };
-        return Ok(values);
-    }
+            _context = context;
+        }
 
-    [HttpGet("schools/{schoolId}/classes/{className}/female-percentage")]
-    public IActionResult GetFemalePercentage(int schoolId, string className)
-    {
-        if (!Schools.TryGetValue(schoolId, out var school)) return NotFound();
-        return Ok(school.GetFemalePercentageInClass(className));
-    }
+        [HttpPost("schools")]
+        public IActionResult CreateSchool([FromBody] SchoolDto request)
+        {
+            var school = new School(request.Name);
+            _context.Schools.Add(school);
+            _context.SaveChanges();
+            return Created($"/api/school/{school.ID}", new { id = school.ID });
+        }
 
-    [HttpGet("schools/{schoolId}/classrooms/{roomId}/can-fit/{className}")]
-    public IActionResult CanClassFit(int schoolId, int roomId, string className)
-    {
-        if (!Schools.TryGetValue(schoolId, out var school) ||
-            !Classrooms.TryGetValue(roomId, out var room)) return NotFound();
-        return Ok(school.CanClassFitInRoom(className, room));
-    }
+        [HttpPost("students")]
+        public IActionResult CreateStudent([FromBody] StudentDto dto)
+        {
+            var student = new Student(dto.Firstname, dto.Lastname, dto.Gender, dto.Birthdate, dto.SchoolClass, dto.Track);
+            _context.Students.Add(student);
+            _context.SaveChanges();
+            return Created($"/api/student/{student.ID}", new { id = student.ID });
+        }
 
-    private static string MapClass(string code) => code switch
-    {
-        "0" => "3aWI",
-        "1" => "3bWI",
-        _ => code
-    };
+        [HttpPost("classrooms")]
+        public IActionResult CreateClassroom([FromBody] ClassroomDto dto)
+        {
+            var room = new Classroom(dto.Name, dto.Size, dto.Seats, dto.Cynap);
+            _context.Classrooms.Add(room);
+            _context.SaveChanges();
+            return Created($"/api/classroom/{room.ID}", new { id = room.ID });
+        }
+
+        [HttpGet("schools")]
+        public IActionResult GetSchools()
+        {
+            return Ok(_context.Schools.Select(s => new { s.ID, s.Name }));
+        }
+    }
 }
+
