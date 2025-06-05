@@ -1,22 +1,29 @@
 ﻿// ----- Helper -----
 const api = p => `/api/${p}`;
-const post = (u,b) => fetch(u,{method:'POST',headers:{'Content-Type':'application/json'},body:JSON.stringify(b)}).then(r=>r.json());
-const get  =  u     => fetch(u).then(r=>r.json());
+const post = (u,b) =>
+  fetch(u,{method:'POST',headers:{'Content-Type':'application/json'},body:JSON.stringify(b)})
+    .then(async r => { if(!r.ok) throw new Error(r.status); return r.json(); });
+const get  = u =>
+  fetch(u)
+    .then(async r => { if(!r.ok) throw new Error(r.status); return r.json(); });
 
 function addOpt(sel, v, t){ document.querySelectorAll(sel).forEach(s => s.add(new Option(t,v))); }
 function log(txt){ const o=document.getElementById('output'); o.textContent=txt+'\n'+o.textContent; }
 function set(id,txt){ document.getElementById(id).textContent=txt; }
 
 // ----- Create -----
-document.getElementById('school').onsubmit   = async e => { e.preventDefault();
-    const {id}=await post(api('schools'),{});
-    addOpt('.school-dropdown',id,`School ${id}`); log(`School ${id} created`);
+document.getElementById('school').onsubmit   = async e => {
+    e.preventDefault();
+    const f=e.target, dto={ name:f.name.value };
+    const {id}=await post(api('schools'),dto);
+    addOpt('.school-dropdown',id,f.name.value); log(`School ${id} created`); f.reset();
 };
 
-document.getElementById('classroom').onsubmit = async e => { e.preventDefault();
-    const f=e.target, dto={ size:f.size.value, seats:+f.seats.value, cynap:f.cynap.checked };
+document.getElementById('classroom').onsubmit = async e => {
+    e.preventDefault();
+    const f=e.target, dto={ name:f.name.value, size:f.size.value, seats:+f.seats.value, cynap:f.cynap.checked };
     const r=await post(api('classrooms'),dto);
-    addOpt('.classroom-dropdown',r.id,`Room ${r.id}`); log(`Room ${r.id} created`); f.reset();
+    addOpt('.classroom-dropdown',r.id,f.name.value); log(`Room ${r.id} created`); f.reset();
 };
 
 document.getElementById('student').onsubmit  = async e => { e.preventDefault();
