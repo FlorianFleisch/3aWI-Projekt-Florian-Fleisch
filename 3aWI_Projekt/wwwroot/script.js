@@ -20,9 +20,16 @@ document.getElementById('classroom').onsubmit = async e => { e.preventDefault();
 };
 
 document.getElementById('student').onsubmit  = async e => { e.preventDefault();
-    const f=e.target, dto={ schoolClass:f.schoolclass.value, gender:f.gender.value, birthdate:f.birthdate.value };
+    const f=e.target, dto={
+      firstname:f.firstname.value,
+      lastname:f.lastname.value,
+      track:f.track.value,
+      schoolClass:f.schoolclass.value,
+      gender:f.gender.value,
+      birthdate:f.birthdate.value
+    };
     const r=await post(api('students'),dto);
-    addOpt('.student-dropdown',r.id,`${r.vorname} ${r.nachname}`); log(`Student ${r.id} created`); f.reset();
+    addOpt('.student-dropdown',r.id,`${dto.firstname} ${dto.lastname}`); log(`Student ${r.id} created`); f.reset();
 };
 
 // ----- Relations -----
