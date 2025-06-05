@@ -135,6 +135,7 @@ public class SchoolController : ControllerBase
         return Ok(values);
         
 using Microsoft.AspNetCore.Mvc;
+using Microsoft.EntityFrameworkCore;
 using _3aWI_Projekt.Database;
 using _3aWI_Projekt.DTO;
 using _3aWI_Projekt.Models;
@@ -257,8 +258,94 @@ namespace _3aWI_Projekt.Controllers
             if (room == null) return NotFound();
             int size = _context.Students.Count(s => s.SchoolClass.ToString() == className);
             return Ok(room.Seats >= size);
+        }
+
+        // ----- New Endpoints -----
+
+        [HttpPost("schools/{schoolId}/students/{studentId}")]
+        public IActionResult AddStudentToSchool(int schoolId, int studentId)
         {
-            return Ok(_context.Schools.Select(s => new { s.ID, s.Name }));
+            var school = _context.Schools
+                .Include(s => s.Students)
+                .FirstOrDefault(s => s.ID == schoolId);
+            var student = _context.Students.Find(studentId);
+            if (school == null || student == null) return NotFound();
+            school.AddStudent(student);
+            _context.SaveChanges();
+            return Ok();
+        }
+
+        [HttpPost("schools/{schoolId}/classrooms/{classroomId}")]
+        public IActionResult AddClassroomToSchool(int schoolId, int classroomId)
+        {
+            var school = _context.Schools
+                .Include(s => s.Classrooms)
+                .FirstOrDefault(s => s.ID == schoolId);
+            var room = _context.Classrooms.Find(classroomId);
+            if (school == null || room == null) return NotFound();
+            school.AddClassroom(room);
+            _context.SaveChanges();
+            return Ok();
+        }
+
+        [HttpPost("classrooms/{classroomId}/students/{studentId}")]
+        public IActionResult AddStudentToClassroom(int classroomId, int studentId)
+        {
+            var classroom = _context.Classrooms
+                .Include(c => c.Students)
+                .FirstOrDefault(c => c.ID == classroomId);
+            var student = _context.Students.Find(studentId);
+            if (classroom == null || student == null) return NotFound();
+            classroom.AddStudent(student);
+            _context.SaveChanges();
+            return Ok();
+        }
+
+        [HttpGet("schools/{schoolId}/values")]
+        public IActionResult GetSchoolValues(int schoolId)
+        {
+            var school = _context.Schools
+                .Include(s => s.Students)
+                .Include(s => s.Classrooms)
+                .FirstOrDefault(s => s.ID == schoolId);
+            if (school == null) return NotFound();
+
+            var (male, female) = school.GetMaleAndFemaleStudentCount();
+            var values = new
+            {
+                numberOfStudents = school.GetNumberOfStudents(),
+                numberOfMaleStudents = male,
+                numberOfFemaleStudents = female,
+                averageAgeOfStudents = school.GetAverageAge(),
+                numberOfClassrooms = school.GetNumberOfClassrooms(),
+                classroomsWithCynap = school.GetClassroomsWithCynap().Select(r => r.ID),
+                classroomsWithNumberOfStudents = school.GetClassStudentCounts()
+            };
+
+            return Ok(values);
+        }
+
+        [HttpGet("schools/{schoolId}/classes/{className}/female-percentage")]
+        public IActionResult GetFemalePercentageInClass(int schoolId, string className)
+        {
+            var school = _context.Schools
+                .Include(s => s.Students)
+                .FirstOrDefault(s => s.ID == schoolId);
+            if (school == null) return NotFound();
+            double percentage = school.GetFemalePercentageInClass(className);
+            return Ok(percentage);
+        }
+
+        [HttpGet("schools/{schoolId}/classrooms/{roomId}/can-fit/{className}")]
+        public IActionResult CanClassFitInRoom(int schoolId, int roomId, string className)
+        {
+            var school = _context.Schools
+                .Include(s => s.Students)
+                .FirstOrDefault(s => s.ID == schoolId);
+            var room = _context.Classrooms.Find(roomId);
+            if (school == null || room == null) return NotFound();
+            bool ok = school.CanClassFitInRoom(className, room);
+            return Ok(ok);
         }
     }
 }
