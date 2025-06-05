@@ -1,3 +1,6 @@
+using _3aWI_Projekt.Database;
+using Microsoft.EntityFrameworkCore;
+
 var builder = WebApplication.CreateBuilder(args);
 
 builder.Services.AddCors(options =>
@@ -17,9 +20,14 @@ builder.Services.AddDbContext<_3aWI_Projekt.Database.AppDbContext>();
 
 var app = builder.Build();
 
+using (var scope = app.Services.CreateScope())
+{
+    var dbContext = scope.ServiceProvider.GetRequiredService<AppDbContext>();
+    dbContext.Database.Migrate();
+}
+
 app.UseDefaultFiles();
 app.UseStaticFiles();
-=======
 if (app.Environment.IsDevelopment())
 {
     app.UseStaticFiles();
