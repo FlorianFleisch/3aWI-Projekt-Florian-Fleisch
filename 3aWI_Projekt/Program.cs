@@ -20,8 +20,8 @@ app.UseDefaultFiles();
 app.UseStaticFiles();
 
 app.UseCors("AllowLocalhost");
-app.UseHttpsRedirection();
 app.UseAuthorization();
 app.MapControllers();
+
 
 app.Run();
