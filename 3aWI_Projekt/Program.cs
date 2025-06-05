@@ -26,6 +26,8 @@ using (var scope = app.Services.CreateScope())
     dbContext.Database.Migrate();
 }
 
+app.UseDefaultFiles();
+app.UseStaticFiles();
 if (app.Environment.IsDevelopment())
 {
     app.UseStaticFiles();
