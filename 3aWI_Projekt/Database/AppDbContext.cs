@@ -11,8 +11,9 @@ namespace _3aWI_Projekt.Database
 
         protected override void OnConfiguring(DbContextOptionsBuilder optionsBuilder)
         {
-            string dbPath = Path.Combine(AppContext.BaseDirectory, "app.db");
+            string dbPath = Path.Combine(Directory.GetCurrentDirectory(), "Database\\app.db");
             optionsBuilder.UseSqlite($"Data Source={dbPath}");
+            optionsBuilder.LogTo(log => { Console.WriteLine(log); },LogLevel.Error);
         }
     }
 }
