@@ -19,6 +19,13 @@ var app = builder.Build();
 
 app.UseDefaultFiles();
 app.UseStaticFiles();
+=======
+if (app.Environment.IsDevelopment())
+{
+    app.UseStaticFiles();
+    app.UseSwagger();
+    app.UseSwaggerUI();
+}
 
 if (app.Environment.IsDevelopment())
 {
