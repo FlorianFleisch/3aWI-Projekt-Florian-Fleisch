@@ -16,7 +16,7 @@ namespace _3aWI_Projekt.Controllers
             _context = context;
         }
 
-        [HttpPost("schools")]
+        [HttpPost("Createschool")]
         public IActionResult CreateSchool([FromBody] SchoolDto request)
         {
             var school = new School(request.Name);
