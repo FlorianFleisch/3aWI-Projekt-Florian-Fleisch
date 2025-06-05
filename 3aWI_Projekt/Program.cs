@@ -16,10 +16,8 @@ builder.Services.AddDbContext<_3aWI_Projekt.Database.AppDbContext>();
 
 var app = builder.Build();
 
-if (app.Environment.IsDevelopment())
-{
-    app.UseStaticFiles();
-}
+app.UseDefaultFiles();
+app.UseStaticFiles();
 
 app.UseCors("AllowLocalhost");
 app.UseHttpsRedirection();
