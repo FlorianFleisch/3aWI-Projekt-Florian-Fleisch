@@ -7,7 +7,7 @@ using _3aWI_Projekt.Models;
 namespace _3aWI_Projekt.Controllers
 {
     [ApiController]
-    [Route("api/[controller]")]
+    [Route("api")]
     public class SchoolController : ControllerBase
     {
         private readonly AppDbContext _Context;
@@ -17,13 +17,13 @@ namespace _3aWI_Projekt.Controllers
             _Context = context;
         }
 
-        [HttpPost("Createschool")]
+        [HttpPost("schools")]
         public IActionResult CreateSchool([FromBody] SchoolDto request)
         {
             var school = new School(request.Name);
             _Context.Schools.Add(school);
             _Context.SaveChanges();
-            return Created($"/api/school/{school.ID}", new { id = school.ID });
+            return Created($"/api/schools/{school.ID}", new { id = school.ID });
         }
 
         [HttpPost("students")]
@@ -32,7 +32,7 @@ namespace _3aWI_Projekt.Controllers
             var student = new Student(dto.Firstname, dto.Lastname, dto.Gender, dto.Birthdate, dto.SchoolClass, dto.Track);
             _Context.Students.Add(student);
             _Context.SaveChanges();
-            return Created($"/api/student/{student.ID}", new { id = student.ID });
+            return Created($"/api/students/{student.ID}", new { id = student.ID });
         }
 
         [HttpPost("classrooms")]
@@ -41,7 +41,7 @@ namespace _3aWI_Projekt.Controllers
             var room = new Classroom(dto.Name, dto.Size, dto.Seats, dto.Cynap);
             _Context.Classrooms.Add(room);
             _Context.SaveChanges();
-            return Created($"/api/classroom/{room.ID}", new { id = room.ID });
+            return Created($"/api/classrooms/{room.ID}", new { id = room.ID });
         }
 
         [HttpGet("schools")]
