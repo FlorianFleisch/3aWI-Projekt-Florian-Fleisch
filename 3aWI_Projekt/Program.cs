@@ -12,12 +12,16 @@ builder.Services.AddCors(options =>
 
 builder.Services.AddControllers();
 builder.Services.AddEndpointsApiExplorer();
+builder.Services.AddSwaggerGen();
+builder.Services.AddDbContext<_3aWI_Projekt.Database.AppDbContext>();
 
 var app = builder.Build();
 
 if (app.Environment.IsDevelopment())
 {
     app.UseStaticFiles();
+    app.UseSwagger();
+    app.UseSwaggerUI();
 }
 
 app.UseCors("AllowLocalhost");
