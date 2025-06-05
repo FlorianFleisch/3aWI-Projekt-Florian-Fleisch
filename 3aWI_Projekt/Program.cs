@@ -27,6 +27,12 @@ if (app.Environment.IsDevelopment())
     app.UseSwaggerUI();
 }
 
+if (app.Environment.IsDevelopment())
+{
+    app.UseSwagger();
+    app.UseSwaggerUI();
+}
+
 app.UseCors("AllowLocalhost");
 app.UseAuthorization();
 app.MapControllers();
